@@ -22,6 +22,10 @@ class Post extends Model
         'user_id'
     ];
 
+    protected $casts = [
+        'published_at' => 'datetime'
+    ];
+
     public function user() : BelongsTo {
         return $this->belongsTo(User::class);
     }
@@ -29,7 +33,12 @@ class Post extends Model
     public function categories() : BelongsToMany {
         return $this->belongsToMany(Category::class);
     }
+
     public function shortBody() {
         return Str::words(strip_tags($this->body), 30);
+    }
+
+    public function getFormattedDate() {
+        return $this->published_at->format('F jS Y');
     }
 }
