@@ -51,7 +51,7 @@ class PostController extends Controller
         }
 
         $prev = Post::query()
-                        ->where('active', true)
+                        ->where('active', '=', true)
                         ->whereDate('published_at', '<=', Carbon::now())
                         ->whereDate('published_at', '>', $post->published_at)
                         ->orderBy('published_at', 'asc')
@@ -59,7 +59,7 @@ class PostController extends Controller
                         ->first();
 
         $next = Post::query()
-                        ->where('active', true)
+                        ->where('active', '=', true)
                         ->whereDate('published_at', '<=', Carbon::now())
                         ->whereDate('published_at', '<', $post->published_at)
                         ->orderBy('published_at', 'desc')
