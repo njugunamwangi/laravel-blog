@@ -5,10 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>
-        {{ \App\Models\TextWidget::getTitle('header') }}
+        {{ $metaTitle ?: \App\Models\TextWidget::getTitle('header') }}
     </title>
-    <meta name="author" content="">
-    <meta name="description" content="">
+    <meta name="author" content="Njuguna Mwangi">
+    <meta name="description" content="{{ $metaDescription }}">
 
     <!-- Tailwind -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
@@ -30,7 +30,7 @@
     <!-- Text Header -->
     <header class="w-full container mx-auto">
         <div class="flex flex-col items-center py-12">
-            <a class="font-bold text-gray-800 uppercase hover:text-gray-700 text-5xl" href="#">
+            <a class="font-bold text-gray-800 uppercase hover:text-gray-700 text-5xl" href="{{route('home')}}">
                 {{ \App\Models\TextWidget::getTitle('header')}}
             </a>
             <p class="text-lg text-gray-600">
