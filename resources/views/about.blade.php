@@ -1,7 +1,7 @@
 <x-app-layout>
     <section class="w-full flex flex-col items-center px-3">
 
-        <article class="flex flex-col shadow my-4">
+        <article class="w-full flex flex-col shadow my-4">
             <!-- Article Image -->
             <a href="#" class="hover:opacity-75">
                 <img src="/storage/{{$widget->image}}">
