@@ -57,6 +57,9 @@ class PostResource extends Resource
                             ->multiple()
                             ->relationship('categories', 'title')
                             ->required(),
+                        Forms\Components\TextInput::make('meta_title'),
+                        Forms\Components\TextInput::make('meta_description'),
+
                 ])->columnSpan(4),
 
             ])->columns(12);
