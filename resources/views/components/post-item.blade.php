@@ -2,7 +2,7 @@
     <article class="flex flex-col shadow my-4">
         <!-- Article Image -->
         <a href="{{route('view', $post)}}" class="hover:opacity-75">
-            <img src="{{$post->getThumbnail()}}">
+            <img src="{{$post->getThumbnail()}}" alt="{{$post->title}}" class="aspect-[4/3] object-contain">
         </a>
         <div class="bg-white flex flex-col justify-start p-6">
             <div class="flex gap-4">

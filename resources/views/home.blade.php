@@ -55,25 +55,28 @@
             </div>
         </div>
         <!-- Latest Categories -->
-        <div>
-            <h2 class="text-lg sm:text-xl font-bold text-blue-500 uppercase pb-1 border-b-2 border-blue-500 mb-3" >
-                Recent Categories
-            </h2>
-        </div>
+        @foreach($categories as $category)
+            <div>
+                <h2 class="text-lg sm:text-xl font-bold text-blue-500 uppercase pb-1 border-b-2 border-blue-500 mb-3" >
+                Posts for {{$category->title}} Category
+                <a href="{{route('by-category', $category)}}">
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+                </h2>
+                    <div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            @foreach($category->posts as $post)
+                                <x-post-item :post="$post"/>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            @endforeach
 
     </div>
     <!-- Posts Section -->
-    <section class="w-full md:w-2/3 flex flex-col items-center px-3">
 
-        @foreach($posts as $post)
-            <x-post-item :post="$post"></x-post-item>
-        @endforeach
-
-
-        {{$posts->onEachSide(1)->links()}}
-
-    </section>
 
     <!-- Sidebar Section -->
-    <x-sidebar />
+
 </x-app-layout>

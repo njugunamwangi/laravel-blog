@@ -37,7 +37,7 @@ class PostController extends Controller
             ->whereDate('published_at', '<', Carbon::now())
             ->orderByDesc('upvote_count')
             ->groupBy('posts.id')
-            ->limit(10)
+            ->limit(5)
             ->get();
 
         // if authorized show recommended posts based on upvotes
@@ -71,13 +71,30 @@ class PostController extends Controller
         }
 
         // show recent categories with their latest posts
+        $categories = Category::query()
+            ->with(['posts' => function($query) {
+                $query->orderByDesc('published_at')->limit(3);
+            }])
+            ->whereHas('posts', function($query) {
+                $query->where('active', '=', 1)
+                ->whereDate('published_at', '<', Carbon::now());
+            })
+            ->select('categories.*')
+            ->selectRaw('MAX(posts.published_at) as max_date')
+            ->leftJoin('category_post', 'categories.id', '=', 'category_post.category_id')
+            ->leftJoin('posts', 'posts.id', '=','category_post.post_id')
+            ->orderBy('max_date')
+            ->groupBy('categories.id')
+            ->limit(5)
+            ->get();
+
         $posts = Post::query()
                         ->where('active', '=', 1)
                         ->whereDate('published_at', '<', Carbon::now())
                         ->orderBy('published_at', 'desc')
                         ->paginate(5);
 
-        return view('home', compact('posts', 'latestPost', 'popularPosts', 'recommendedPosts'));
+        return view('home', compact('posts','latestPost', 'popularPosts', 'recommendedPosts', 'categories'));
     }
 
     /**
