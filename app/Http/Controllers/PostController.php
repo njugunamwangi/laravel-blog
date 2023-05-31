@@ -39,7 +39,37 @@ class PostController extends Controller
             ->groupBy('posts.id')
             ->limit(10)
             ->get();
+
         // if authorized show recommended posts based on upvotes
+        $user = auth()->user();
+
+        if ($user) {
+            $leftJoin = "(SELECT cp.category_id, cp.post_id FROM upvote_downvotes
+                JOIN category_post as cp ON upvote_downvotes.post_id =
+                cp.post_id WHERE upvote_downvotes.is_upvote = 1 and upvote_downvotes.user_id = ?) as t";
+            $recommendedPosts = Post::query()
+                ->leftJoin('category_post as cp', 'posts.id', '=', 'cp.post_id')
+                ->leftJoin(DB::raw($leftJoin), function($join) {
+                    $join->on('t.category_id', '=', 'cp.category_id')
+                        ->on('t.post_id', '<>', 'cp.post_id');
+                })
+                ->select('posts.*')
+                ->where('cp.post_id', '<>',DB::raw('t.post_id'))
+                ->setBindings([$user->id])
+                ->limit(3)
+                ->get();
+        } else {
+            $recommendedPosts = Post::query()
+                ->leftJoin('post_views', 'posts.id', '=', 'post_views.post_id')
+                ->select('posts.*', DB::raw('COUNT(post_views.id) as view_count'))
+                ->where('active', '=', 1)
+                ->whereDate('published_at', '<', Carbon::now())
+                ->orderByDesc('view_count')
+                ->groupBy('posts.id')
+                ->limit(3)
+                ->get();
+        }
+
         // show recent categories with their latest posts
         $posts = Post::query()
                         ->where('active', '=', 1)
@@ -47,7 +77,7 @@ class PostController extends Controller
                         ->orderBy('published_at', 'desc')
                         ->paginate(5);
 
-        return view('home', compact('posts', 'latestPost', 'popularPosts'));
+        return view('home', compact('posts', 'latestPost', 'popularPosts', 'recommendedPosts'));
     }
 
     /**
