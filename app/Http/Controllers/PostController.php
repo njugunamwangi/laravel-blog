@@ -7,6 +7,7 @@ use App\Models\Post;
 use App\Models\PostView;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -23,7 +24,21 @@ class PostController extends Controller
             ->orderBy('published_at', 'desc')
             ->limit(1)
             ->first();
+
         // 3 most popular post based on upvotes
+        $popularPosts = Post::query()
+            ->leftJoin('upvote_downvotes', 'posts.id', '=', 'upvote_downvotes.post_id')
+            ->select('posts.*', DB::raw('COUNT(upvote_downvotes.id) as upvote_count'))
+            ->where(function($query) {
+                $query->whereNull('upvote_downvotes.is_upvote')
+                    ->orWhere('upvote_downvotes.is_upvote', '=', 1);
+            })
+            ->where('active', '=', 1)
+            ->whereDate('published_at', '<', Carbon::now())
+            ->orderByDesc('upvote_count')
+            ->groupBy('posts.id')
+            ->limit(10)
+            ->get();
         // if authorized show recommended posts based on upvotes
         // show recent categories with their latest posts
         $posts = Post::query()
@@ -32,7 +47,7 @@ class PostController extends Controller
                         ->orderBy('published_at', 'desc')
                         ->paginate(5);
 
-        return view('home', compact('posts', 'latestPost'));
+        return view('home', compact('posts', 'latestPost', 'popularPosts'));
     }
 
     /**
